@@ -2,6 +2,7 @@ import {Dialog, Transition} from '@headlessui/react'
 import {Bars3Icon, XMarkIcon} from '@heroicons/react/24/outline'
 import type {LinksFunction, MetaFunction} from '@remix-run/node'
 import {
+  Link,
   Links,
   LiveReload,
   Meta,
@@ -95,13 +96,14 @@ export default function App() {
                         </button>
                       </div>
                     </Transition.Child>
-                    <div className="h-0 flex-1 overflow-y-auto pt-5 pb-4">
-                      <div className="flex flex-shrink-0 items-center px-4">
-                        <img
-                          className="h-8 w-auto"
-                          src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                          alt="Your Company"
-                        />
+                    <div className="h-0 flex-1 overflow-y-auto pt-2 pb-4">
+                      <div className="mx-auto mt-5 px-2">
+                        <Link
+                          to="search"
+                          className="inline-flex w-1/2 items-center rounded-full border border-transparent bg-indigo-600 px-3.5 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        >
+                          Search Song
+                        </Link>
                       </div>
                       <nav className="mt-5 space-y-1 px-2">
                         {songs.map(song => (
@@ -135,14 +137,13 @@ export default function App() {
           <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
             {/* Sidebar component, swap this element with another sidebar if you like */}
             <div className="flex min-h-0 flex-1 flex-col border-r border-gray-200 bg-white">
-              <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
-                <div className="flex flex-shrink-0 items-center px-4">
-                  <img
-                    className="h-8 w-auto"
-                    src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                    alt="Your Company"
-                  />
-                </div>
+              <div className="flex flex-1 flex-col overflow-y-auto pt-2 pb-4">
+                <Link
+                  to="search"
+                  className="mx-auto mt-5 inline-flex w-1/2 items-center rounded-full border border-transparent bg-indigo-600 px-3.5 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                >
+                  Search Song
+                </Link>
                 <nav className="mt-5 flex-1 space-y-1 bg-white px-2">
                   {songs.map(song => (
                     <NavLink
