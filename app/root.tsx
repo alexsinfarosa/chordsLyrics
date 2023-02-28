@@ -1,5 +1,11 @@
-import {Dialog, Transition} from '@headlessui/react'
-import {Bars3Icon, XMarkIcon} from '@heroicons/react/24/outline'
+import {Disclosure, Menu, Transition} from '@headlessui/react'
+import {MagnifyingGlassIcon} from '@heroicons/react/20/solid'
+import {Bars3CenterLeftIcon, XMarkIcon} from '@heroicons/react/24/outline'
+import {
+  EyeIcon,
+  ListBulletIcon,
+  PencilSquareIcon,
+} from '@heroicons/react/24/solid'
 import type {LinksFunction, MetaFunction} from '@remix-run/node'
 import {
   Link,
@@ -15,6 +21,7 @@ import {
 import clsx from 'clsx'
 import {Fragment, useState} from 'react'
 import {supabase} from '~/utils/supabase'
+
 import styles from './tailwind.css'
 
 export const links: LinksFunction = () => {
@@ -29,12 +36,18 @@ export const meta: MetaFunction = () => ({
 
 export async function loader() {
   const {data} = await supabase.from('songs').select('*')
-  return {songs: data ?? []}
+  let songs: {id: string; title: string}[] = []
+  if (data) {
+    songs = data.map(song => ({id: song.id, title: song.title}))
+  }
+  return {songs}
 }
 
 export default function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
   const {songs} = useLoaderData<typeof loader>()
+  const [isList, setIsList] = useState(true)
+  const [isView, setIsView] = useState(true)
+  const [isEdit, setIsEdit] = useState(true)
 
   return (
     <html lang="en" className="h-full">
@@ -43,145 +56,239 @@ export default function App() {
         <Links />
       </head>
       <body className="h-full">
-        <div>
-          <Transition.Root show={sidebarOpen} as={Fragment}>
-            <Dialog
-              as="div"
-              className="relative z-40 lg:hidden"
-              onClose={setSidebarOpen}
-            >
-              <Transition.Child
-                as={Fragment}
-                enter="transition-opacity ease-linear duration-300"
-                enterFrom="opacity-0"
-                enterTo="opacity-100"
-                leave="transition-opacity ease-linear duration-300"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
-              >
-                <div className="fixed inset-0 bg-gray-600 bg-opacity-75" />
-              </Transition.Child>
-
-              <div className="fixed inset-0 z-40 flex">
-                <Transition.Child
-                  as={Fragment}
-                  enter="transition ease-in-out duration-300 transform"
-                  enterFrom="-translate-x-full"
-                  enterTo="translate-x-0"
-                  leave="transition ease-in-out duration-300 transform"
-                  leaveFrom="translate-x-0"
-                  leaveTo="-translate-x-full"
-                >
-                  <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col bg-white">
-                    <Transition.Child
-                      as={Fragment}
-                      enter="ease-in-out duration-300"
-                      enterFrom="opacity-0"
-                      enterTo="opacity-100"
-                      leave="ease-in-out duration-300"
-                      leaveFrom="opacity-100"
-                      leaveTo="opacity-0"
-                    >
-                      <div className="absolute top-0 right-0 -mr-12 pt-2">
-                        <button
-                          type="button"
-                          className="ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-                          onClick={() => setSidebarOpen(false)}
-                        >
-                          <span className="sr-only">Close sidebar</span>
-                          <XMarkIcon
-                            className="h-6 w-6 text-white"
-                            aria-hidden="true"
+        <>
+          <div className="relative flex min-h-screen flex-col">
+            {/* Navbar */}
+            <Disclosure as="nav" className="flex-shrink-0 bg-indigo-600">
+              {({open}) => (
+                <>
+                  <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
+                    <div className="relative flex h-16 items-center justify-between">
+                      {/* Logo section */}
+                      <div className="flex items-center px-2 lg:px-0 xl:w-64">
+                        <div className="flex-shrink-0">
+                          <img
+                            className="h-8 w-auto"
+                            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=300"
+                            alt="Your Company"
                           />
-                        </button>
+                        </div>
                       </div>
-                    </Transition.Child>
-                    <div className="h-0 flex-1 overflow-y-auto pt-2 pb-4">
-                      <div className="mx-auto mt-5 px-2">
-                        <Link
-                          to="search"
-                          className="inline-flex w-1/2 items-center rounded-full border border-transparent bg-indigo-600 px-3.5 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
-                          Search Song
-                        </Link>
+
+                      {/* Search section */}
+                      <div className="flex flex-1 justify-center lg:justify-end">
+                        <div className="w-full px-2 lg:px-6">
+                          <label htmlFor="search" className="sr-only">
+                            Search song
+                          </label>
+                          <div className="relative text-indigo-200 focus-within:text-slate-400">
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                              <MagnifyingGlassIcon
+                                className="h-5 w-5"
+                                aria-hidden="true"
+                              />
+                            </div>
+                            <input
+                              id="search"
+                              name="search"
+                              className="block w-full rounded-md border border-transparent bg-indigo-400 bg-opacity-25 py-2 pl-10 pr-3 leading-5 text-indigo-100 placeholder-indigo-200 focus:bg-white focus:text-slate-900 focus:placeholder-slate-400 focus:outline-none focus:ring-0 sm:text-sm"
+                              placeholder="Search projects"
+                              type="search"
+                            />
+                          </div>
+                        </div>
                       </div>
-                      <nav className="mt-5 space-y-1 px-2">
-                        {songs.map(song => (
-                          <NavLink
-                            key={song.id}
-                            to={song.id}
-                            className={({isActive}) =>
-                              clsx(
-                                isActive
-                                  ? 'bg-gray-100 text-gray-900'
-                                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                                'group flex items-center rounded-md px-2 py-2 text-base font-medium',
-                              )
-                            }
+                      <div className="flex lg:hidden">
+                        {/* Mobile menu button */}
+                        <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-indigo-600 p-2 text-indigo-400 hover:bg-indigo-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600">
+                          <span className="sr-only">Open main menu</span>
+                          {open ? (
+                            <XMarkIcon
+                              className="block h-6 w-6"
+                              aria-hidden="true"
+                            />
+                          ) : (
+                            <Bars3CenterLeftIcon
+                              className="block h-6 w-6"
+                              aria-hidden="true"
+                            />
+                          )}
+                        </Disclosure.Button>
+                      </div>
+                      {/* Links section */}
+                      <div className="hidden lg:block lg:w-80">
+                        <div className="flex items-center justify-end">
+                          <span className="isolate inline-flex rounded-md shadow-sm">
+                            <button
+                              type="button"
+                              className={clsx(
+                                'relative inline-flex items-center rounded-l-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500',
+                              )}
+                              onClick={() => setIsList(!isList)}
+                            >
+                              <span className="sr-only">List</span>
+                              <ListBulletIcon
+                                className={clsx(
+                                  isList ? 'text-indigo-600' : '',
+                                  'h-5 w-5',
+                                )}
+                                aria-hidden="true"
+                              ></ListBulletIcon>
+                            </button>
+                            <button
+                              type="button"
+                              className={clsx(
+                                'relative -ml-px inline-flex items-center border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500',
+                              )}
+                              onClick={() => setIsView(!isView)}
+                            >
+                              <span className="sr-only">View</span>
+                              <EyeIcon
+                                className={clsx(
+                                  isView ? 'text-indigo-600' : '',
+                                  'h-5 w-5',
+                                )}
+                                aria-hidden="true"
+                              ></EyeIcon>
+                            </button>
+                            <button
+                              type="button"
+                              className={clsx(
+                                'relative -ml-px inline-flex items-center rounded-r-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500',
+                              )}
+                              onClick={() => setIsEdit(!isEdit)}
+                            >
+                              <span className="sr-only">Edit</span>
+                              <PencilSquareIcon
+                                className={clsx(
+                                  isEdit ? 'text-indigo-600' : '',
+                                  'h-5 w-5',
+                                )}
+                                aria-hidden="true"
+                              ></PencilSquareIcon>
+                            </button>
+                          </span>
+                          {/* Profile dropdown */}
+                          <Menu
+                            as="div"
+                            className="relative ml-4 flex-shrink-0"
                           >
-                            {song.title}
+                            <div>
+                              <Menu.Button className="flex rounded-full bg-indigo-700 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-700">
+                                <span className="sr-only">Open user menu</span>
+                                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500">
+                                  <span className="text-sm font-medium leading-none text-white">
+                                    AS
+                                  </span>
+                                </span>
+                              </Menu.Button>
+                            </div>
+                            <Transition
+                              as={Fragment}
+                              enter="transition ease-out duration-100"
+                              enterFrom="transform opacity-0 scale-95"
+                              enterTo="transform opacity-100 scale-100"
+                              leave="transition ease-in duration-75"
+                              leaveFrom="transform opacity-100 scale-100"
+                              leaveTo="transform opacity-0 scale-95"
+                            >
+                              <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                <Menu.Item>
+                                  {({active}) => (
+                                    <Link
+                                      to="."
+                                      className={clsx(
+                                        active ? 'bg-slate-100' : '',
+                                        'block px-4 py-2 text-sm text-slate-700',
+                                      )}
+                                    >
+                                      Logout
+                                    </Link>
+                                  )}
+                                </Menu.Item>
+                              </Menu.Items>
+                            </Transition>
+                          </Menu>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Disclosure.Panel className="lg:hidden">
+                    <div className="px-2 pt-2 pb-3">
+                      <Disclosure.Button
+                        as="a"
+                        href="#"
+                        className="block rounded-md bg-indigo-800 px-3 py-2 text-base font-medium text-white"
+                      >
+                        Dashboard
+                      </Disclosure.Button>
+                      <Disclosure.Button
+                        as="a"
+                        href="#"
+                        className="mt-1 block rounded-md px-3 py-2 text-base font-medium text-indigo-200 hover:bg-indigo-600 hover:text-indigo-100"
+                      >
+                        Support
+                      </Disclosure.Button>
+                    </div>
+                    <div className="border-t border-indigo-800 pt-4 pb-3">
+                      <div className="px-2">
+                        <Disclosure.Button
+                          as="a"
+                          href="#"
+                          className="mt-1 block rounded-md px-3 py-2 text-base font-medium text-indigo-200 hover:bg-indigo-600 hover:text-indigo-100"
+                        >
+                          Settings
+                        </Disclosure.Button>
+                        <Disclosure.Button
+                          as="a"
+                          href="#"
+                          className="mt-1 block rounded-md px-3 py-2 text-base font-medium text-indigo-200 hover:bg-indigo-600 hover:text-indigo-100"
+                        >
+                          Sign out
+                        </Disclosure.Button>
+                      </div>
+                    </div>
+                  </Disclosure.Panel>
+                </>
+              )}
+            </Disclosure>
+
+            {/* 3 column wrapper */}
+            <div className="mx-auto w-full flex-grow lg:flex xl:px-8">
+              {/* Left sidebar & main wrapper */}
+              <div className="min-w-0 flex-1 bg-white xl:flex">
+                {isList && (
+                  <div className="border-b border-slate-200 bg-white xl:w-64 xl:flex-shrink-0 xl:border-b-0 xl:border-r xl:border-slate-200">
+                    <div className="h-full py-6 pl-4 pr-6 sm:pl-6 lg:pl-8 xl:pl-0">
+                      {/* Left column area */}
+                      <nav className="space-y-1" aria-label="Sidebar">
+                        {songs.map(song => (
+                          <NavLink to={song.id} key={song.id}>
+                            {({isActive}) => (
+                              <span
+                                className={clsx(
+                                  isActive
+                                    ? 'bg-slate-100 text-slate-900'
+                                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                                  'flex items-center rounded-md px-3 py-2 text-sm font-medium',
+                                )}
+                                aria-current={isActive ? 'page' : undefined}
+                              >
+                                <span className="truncate">{song.title}</span>
+                              </span>
+                            )}
                           </NavLink>
                         ))}
                       </nav>
                     </div>
-                  </Dialog.Panel>
-                </Transition.Child>
-                <div className="w-14 flex-shrink-0">
-                  {/* Force sidebar to shrink to fit close icon */}
-                </div>
-              </div>
-            </Dialog>
-          </Transition.Root>
-
-          {/* Static sidebar for desktop */}
-          <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-            {/* Sidebar component, swap this element with another sidebar if you like */}
-            <div className="flex min-h-0 flex-1 flex-col border-r border-gray-200 bg-white">
-              <div className="flex flex-1 flex-col overflow-y-auto pt-2 pb-4">
-                <Link
-                  to="search"
-                  className="mx-auto mt-5 inline-flex w-1/2 items-center rounded-full border border-transparent bg-indigo-600 px-3.5 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                  Search Song
-                </Link>
-                <nav className="mt-5 flex-1 space-y-1 bg-white px-2">
-                  {songs.map(song => (
-                    <NavLink
-                      key={song.id}
-                      to={song.id}
-                      className={({isActive}) =>
-                        clsx(
-                          isActive
-                            ? 'bg-gray-100 text-gray-900'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                          'group flex items-center rounded-md px-2 py-2 text-sm font-medium',
-                        )
-                      }
-                    >
-                      {song.title}
-                    </NavLink>
-                  ))}
-                </nav>
+                  </div>
+                )}
+                <Outlet context={{isView, isEdit}} />
               </div>
             </div>
           </div>
-          <div className="flex flex-1 flex-col lg:pl-64">
-            <div className="sticky top-0 z-10 bg-white pl-1 pt-1 sm:pl-3 sm:pt-3 lg:hidden">
-              <button
-                type="button"
-                className="-ml-0.5 -mt-0.5 inline-flex h-12 w-12 items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <span className="sr-only">Open sidebar</span>
-                <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-              </button>
-            </div>
-            <main className="flex-1">
-              <Outlet></Outlet>
-            </main>
-          </div>
-        </div>
-
+        </>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
