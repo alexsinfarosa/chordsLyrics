@@ -1,5 +1,10 @@
 import type {ActionArgs, LoaderArgs} from '@remix-run/node'
-import {Form, useLoaderData, useOutletContext} from '@remix-run/react'
+import {
+  Form,
+  useLoaderData,
+  useNavigation,
+  useOutletContext,
+} from '@remix-run/react'
 import ChordSheetJS from 'chordsheetjs'
 import React, {useEffect} from 'react'
 import {Panel, PanelGroup, PanelResizeHandle} from 'react-resizable-panels'
@@ -53,21 +58,26 @@ export default function Song() {
     isView: boolean
   }>()
   const {songRaw} = useLoaderData<typeof loader>()
-
   const parsedSong = new ChordSheetJS.ChordProParser().parse(
     songRaw?.song || '',
   )
   const formattedSong = new ChordSheetJS.TextFormatter().format(parsedSong)
-  const [currentSong, setCurrentSong] = React.useState('')
+  const [editSong, setEditSong] = React.useState('')
+
+  const navigation = useNavigation()
+  const busy = navigation.state === 'submitting'
+
+  const hasSongChanged = editSong !== songRaw?.song
+  console.log({hasSongChanged})
 
   useEffect(() => {
-    setCurrentSong(songRaw?.song || '')
+    setEditSong(songRaw?.song || '')
   }, [songRaw])
 
   return (
-    <PanelGroup direction="horizontal">
+    <PanelGroup autoSaveId="song-layout" direction="horizontal">
       {isView && (
-        <Panel minSize={50} className="">
+        <Panel order={1} minSize={50} className="">
           <textarea
             readOnly
             className="h-full w-full resize-none border-none outline-0 focus:outline-0 focus:ring-0"
@@ -76,20 +86,55 @@ export default function Song() {
         </Panel>
       )}
       {isView && isEdit && (
-        <PanelResizeHandle className="border-2 border-slate-200" />
+        <PanelResizeHandle className="border-2 border-slate-100" />
       )}
       {isEdit && (
-        <Panel defaultSize={50} minSize={30} className="">
-          <Form method="post" id="song-form">
+        <Panel
+          order={2}
+          defaultSize={50}
+          minSize={30}
+          collapsible
+          className="relative"
+        >
+          <Form method="post">
             <textarea
+              className="h-[calc(100vh-74px)] w-full resize-none overflow-auto border-none outline-0 focus:outline-0 focus:ring-0"
               name="song"
-              className="h-[calc(100vh-74px)] w-full resize-none overflow-auto border-none bg-slate-50 outline-0 focus:outline-0 focus:ring-0"
-              value={currentSong}
-              onChange={e => setCurrentSong(e.target.value)}
+              value={editSong}
+              onChange={e => setEditSong(e.target.value)}
             />
+            {hasSongChanged && (
+              <button
+                type="submit"
+                className=" absolute top-2 right-2 inline-flex items-center rounded border border-transparent bg-indigo-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              >
+                {busy ? 'Saving' : 'Save'}
+              </button>
+            )}
           </Form>
         </Panel>
       )}
+    </PanelGroup>
+  )
+}
+
+export function ErrorBoundary({error}) {
+  console.log(error)
+  return (
+    <PanelGroup autoSaveId="song-layout" direction="horizontal">
+      <Panel order={1} minSize={50} className="">
+        {error.message}
+      </Panel>
+
+      <PanelResizeHandle className="border-2 border-slate-100" />
+
+      <Panel
+        order={2}
+        defaultSize={50}
+        minSize={30}
+        collapsible
+        className=""
+      ></Panel>
     </PanelGroup>
   )
 }
