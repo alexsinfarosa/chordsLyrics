@@ -1,12 +1,12 @@
-import {Disclosure, Menu, Transition} from '@headlessui/react'
-import {MagnifyingGlassIcon} from '@heroicons/react/20/solid'
-import {Bars3CenterLeftIcon, XMarkIcon} from '@heroicons/react/24/outline'
+import { Disclosure, Menu, Transition } from "@headlessui/react";
+import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
+import { Bars3CenterLeftIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import {
   EyeIcon,
   ListBulletIcon,
   PencilSquareIcon,
-} from '@heroicons/react/24/solid'
-import type {LinksFunction, MetaFunction} from '@remix-run/node'
+} from "@heroicons/react/24/solid";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
   Link,
   Links,
@@ -17,37 +17,37 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
-} from '@remix-run/react'
-import clsx from 'clsx'
-import {Fragment, useState} from 'react'
-import {supabase} from '~/utils/supabase'
+} from "@remix-run/react";
+import clsx from "clsx";
+import { Fragment, useState } from "react";
+import { supabase } from "~/utils/supabase";
 
-import styles from './tailwind.css'
+import styles from "./tailwind.css";
 
 export const links: LinksFunction = () => {
-  return [{rel: 'stylesheet', href: styles}]
-}
+  return [{ rel: "stylesheet", href: styles }];
+};
 
 export const meta: MetaFunction = () => ({
-  charset: 'utf-8',
-  title: 'Chords & Lyrics',
-  viewport: 'width=device-width,initial-scale=1',
-})
+  charset: "utf-8",
+  title: "Chords & Lyrics",
+  viewport: "width=device-width,initial-scale=1",
+});
 
 export async function loader() {
-  const {data} = await supabase.from('songs').select('*')
-  let songs: {id: string; title: string}[] = []
+  const { data } = await supabase.from("songs").select("*");
+  let songs: { id: string; title: string }[] = [];
   if (data) {
-    songs = data.map(song => ({id: song.id, title: song.title}))
+    songs = data.map((song) => ({ id: song.id, title: song.title }));
   }
-  return {songs}
+  return { songs };
 }
 
 export default function App() {
-  const {songs} = useLoaderData<typeof loader>()
-  const [isList, setIsList] = useState(true)
-  const [isView, setIsView] = useState(true)
-  const [isEdit, setIsEdit] = useState(true)
+  const { songs } = useLoaderData<typeof loader>();
+  const [isList, setIsList] = useState(true);
+  const [isView, setIsView] = useState(true);
+  const [isEdit, setIsEdit] = useState(true);
 
   return (
     <html lang="en" className="h-full">
@@ -60,7 +60,7 @@ export default function App() {
           <div className="relative flex min-h-screen flex-col">
             {/* Navbar */}
             <Disclosure as="nav" className="flex-shrink-0 bg-indigo-600">
-              {({open}) => (
+              {({ open }) => (
                 <>
                   <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
                     <div className="relative flex h-16 items-center justify-between">
@@ -122,15 +122,15 @@ export default function App() {
                             <button
                               type="button"
                               className={clsx(
-                                'relative inline-flex items-center rounded-l-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500',
+                                "relative inline-flex items-center rounded-l-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                               )}
                               onClick={() => setIsList(!isList)}
                             >
                               <span className="sr-only">List</span>
                               <ListBulletIcon
                                 className={clsx(
-                                  isList ? 'text-indigo-600' : '',
-                                  'h-5 w-5',
+                                  isList ? "text-indigo-600" : "",
+                                  "h-5 w-5"
                                 )}
                                 aria-hidden="true"
                               ></ListBulletIcon>
@@ -138,15 +138,15 @@ export default function App() {
                             <button
                               type="button"
                               className={clsx(
-                                'relative -ml-px inline-flex items-center border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500',
+                                "relative -ml-px inline-flex items-center border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                               )}
                               onClick={() => setIsView(!isView)}
                             >
                               <span className="sr-only">View</span>
                               <EyeIcon
                                 className={clsx(
-                                  isView ? 'text-indigo-600' : '',
-                                  'h-5 w-5',
+                                  isView ? "text-indigo-600" : "",
+                                  "h-5 w-5"
                                 )}
                                 aria-hidden="true"
                               ></EyeIcon>
@@ -154,15 +154,15 @@ export default function App() {
                             <button
                               type="button"
                               className={clsx(
-                                'relative -ml-px inline-flex items-center rounded-r-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500',
+                                "relative -ml-px inline-flex items-center rounded-r-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                               )}
                               onClick={() => setIsEdit(!isEdit)}
                             >
                               <span className="sr-only">Edit</span>
                               <PencilSquareIcon
                                 className={clsx(
-                                  isEdit ? 'text-indigo-600' : '',
-                                  'h-5 w-5',
+                                  isEdit ? "text-indigo-600" : "",
+                                  "h-5 w-5"
                                 )}
                                 aria-hidden="true"
                               ></PencilSquareIcon>
@@ -194,12 +194,12 @@ export default function App() {
                             >
                               <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                 <Menu.Item>
-                                  {({active}) => (
+                                  {({ active }) => (
                                     <Link
                                       to="."
                                       className={clsx(
-                                        active ? 'bg-slate-100' : '',
-                                        'block px-4 py-2 text-sm text-slate-700',
+                                        active ? "bg-slate-100" : "",
+                                        "block px-4 py-2 text-sm text-slate-700"
                                       )}
                                     >
                                       Logout
@@ -263,17 +263,17 @@ export default function App() {
                     <div className="h-full py-6 pl-4 pr-6 sm:pl-6 lg:pl-8 xl:pl-0">
                       {/* Left column area */}
                       <nav className="space-y-1" aria-label="Sidebar">
-                        {songs.map(song => (
+                        {songs.map((song) => (
                           <NavLink to={song.id} key={song.id}>
-                            {({isActive}) => (
+                            {({ isActive }) => (
                               <span
                                 className={clsx(
                                   isActive
-                                    ? 'bg-slate-100 text-slate-900'
-                                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
-                                  'flex items-center rounded-md px-3 py-2 text-sm font-medium',
+                                    ? "bg-slate-100 text-slate-900"
+                                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+                                  "flex items-center rounded-md px-3 py-2 text-sm font-medium"
                                 )}
-                                aria-current={isActive ? 'page' : undefined}
+                                aria-current={isActive ? "page" : undefined}
                               >
                                 <span className="truncate">{song.title}</span>
                               </span>
@@ -284,7 +284,7 @@ export default function App() {
                     </div>
                   </div>
                 )}
-                <Outlet context={{isView, isEdit}} />
+                <Outlet context={{ isView, isEdit }} />
               </div>
             </div>
           </div>
@@ -294,5 +294,5 @@ export default function App() {
         <LiveReload />
       </body>
     </html>
-  )
+  );
 }

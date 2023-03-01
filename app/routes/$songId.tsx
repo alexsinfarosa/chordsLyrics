@@ -2,6 +2,7 @@ import type {ActionArgs, LoaderArgs} from '@remix-run/node'
 import {Form, useLoaderData, useOutletContext} from '@remix-run/react'
 import ChordSheetJS from 'chordsheetjs'
 import React, {useEffect} from 'react'
+import {Panel, PanelGroup, PanelResizeHandle} from 'react-resizable-panels'
 import invariant from 'tiny-invariant'
 import {supabase} from '~/utils/supabase'
 
@@ -64,35 +65,31 @@ export default function Song() {
   }, [songRaw])
 
   return (
-    <>
+    <PanelGroup direction="horizontal">
       {isView && (
-        <div className="bg-white lg:min-w-0 lg:flex-1">
-          <div className="h-full py-6 px-4 sm:px-6 lg:px-8">
-            {/* Main area */}
-            <textarea
-              readOnly
-              className="h-screen w-full resize-none border-none outline-0 focus:outline-0 focus:ring-0"
-              value={formattedSong}
-            />
-          </div>
-        </div>
+        <Panel minSize={50} className="">
+          <textarea
+            readOnly
+            className="h-full w-full resize-none border-none outline-0 focus:outline-0 focus:ring-0"
+            value={formattedSong}
+          />
+        </Panel>
       )}
-
+      {isView && isEdit && (
+        <PanelResizeHandle className="border-2 border-slate-200" />
+      )}
       {isEdit && (
-        <div className="bg-indigo-50 pr-4 sm:pr-6 lg:flex-shrink-0 lg:border-l lg:border-slate-200 lg:pr-8 xl:pr-0">
-          <div className="h-full py-6 pl-6 lg:w-80">
-            {/* Right column area */}
-            <Form method="post" id="song-form">
-              <textarea
-                name="song"
-                className="h-screen w-full resize-none border-none outline-0 focus:outline-0 focus:ring-0"
-                value={currentSong}
-                onChange={e => setCurrentSong(e.target.value)}
-              />
-            </Form>
-          </div>
-        </div>
+        <Panel defaultSize={50} minSize={30} className="">
+          <Form method="post" id="song-form">
+            <textarea
+              name="song"
+              className="h-[calc(100vh-74px)] w-full resize-none overflow-auto border-none bg-slate-50 outline-0 focus:outline-0 focus:ring-0"
+              value={currentSong}
+              onChange={e => setCurrentSong(e.target.value)}
+            />
+          </Form>
+        </Panel>
       )}
-    </>
+    </PanelGroup>
   )
 }
