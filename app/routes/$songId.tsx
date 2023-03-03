@@ -62,7 +62,9 @@ export default function Song() {
     songRaw?.song || '',
   )
   const formattedSong = new ChordSheetJS.TextFormatter().format(parsedSong)
-  const [editSong, setEditSong] = React.useState('')
+  const [editSong, setEditSong] = React.useState<string | undefined>(
+    songRaw?.song,
+  )
 
   const navigation = useNavigation()
   const busy = navigation.state === 'submitting'
@@ -71,7 +73,7 @@ export default function Song() {
   console.log({hasSongChanged})
 
   useEffect(() => {
-    setEditSong(songRaw?.song || '')
+    setEditSong(songRaw?.song)
   }, [songRaw])
 
   return (
@@ -102,6 +104,7 @@ export default function Song() {
               name="song"
               value={editSong}
               onChange={e => setEditSong(e.target.value)}
+              // onMouseLeave={() => setEditSong(undefined)}
             />
             {hasSongChanged && (
               <button
@@ -119,22 +122,5 @@ export default function Song() {
 }
 
 export function ErrorBoundary({error}) {
-  console.log(error)
-  return (
-    <PanelGroup autoSaveId="song-layout" direction="horizontal">
-      <Panel order={1} minSize={50} className="">
-        {error.message}
-      </Panel>
-
-      <PanelResizeHandle className="border-2 border-slate-100" />
-
-      <Panel
-        order={2}
-        defaultSize={50}
-        minSize={30}
-        collapsible
-        className=""
-      ></Panel>
-    </PanelGroup>
-  )
+  return <div className="lg:px- py-6 px-4 sm:px-6">{error.message}</div>
 }
