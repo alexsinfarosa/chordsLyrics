@@ -58,11 +58,12 @@ export default function Song() {
     isView: boolean
   }>()
   const {songRaw} = useLoaderData<typeof loader>()
-
   const parsedSong = new ChordSheetJS.ChordProParser().parse(
     songRaw?.song || '',
   )
-  const formattedSong = new ChordSheetJS.TextFormatter().format(parsedSong)
+  // const formattedSong = new ChordSheetJS.TextFormatter().format(parsedSong)
+  const formattedSong = new ChordSheetJS.HtmlDivFormatter().format(parsedSong)
+  console.log(formattedSong)
   const [hasSongChanged, setHasSongChanged] = React.useState(false)
   const [editSong, setEditSong] = React.useState<string | undefined>()
 
@@ -85,10 +86,14 @@ export default function Song() {
     <PanelGroup autoSaveId="song-layout" direction="horizontal">
       {isView && (
         <Panel order={1} minSize={50} className="">
-          <textarea
+          {/* <textarea
             readOnly
             className="h-full w-full resize-none border-none outline-0 focus:outline-0 focus:ring-0"
             value={formattedSong}
+          /> */}
+          <div
+            className="h-full w-full"
+            dangerouslySetInnerHTML={{__html: formattedSong}}
           />
         </Panel>
       )}
