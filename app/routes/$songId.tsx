@@ -58,19 +58,24 @@ export default function Song() {
     isView: boolean
   }>()
   const {songRaw} = useLoaderData<typeof loader>()
+
   const parsedSong = new ChordSheetJS.ChordProParser().parse(
     songRaw?.song || '',
   )
   const formattedSong = new ChordSheetJS.TextFormatter().format(parsedSong)
-  const [editSong, setEditSong] = React.useState<string | undefined>(
-    songRaw?.song,
-  )
+  const [hasSongChanged, setHasSongChanged] = React.useState(false)
+  const [editSong, setEditSong] = React.useState<string | undefined>()
 
   const navigation = useNavigation()
   const busy = navigation.state === 'submitting'
 
-  const hasSongChanged = editSong !== songRaw?.song
-  console.log({hasSongChanged})
+  function handleOnSelect() {
+    if (songRaw?.song === editSong) {
+      setHasSongChanged(false)
+    } else {
+      setHasSongChanged(true)
+    }
+  }
 
   useEffect(() => {
     setEditSong(songRaw?.song)
@@ -104,8 +109,10 @@ export default function Song() {
               name="song"
               value={editSong}
               onChange={e => setEditSong(e.target.value)}
-              // onMouseLeave={() => setEditSong(undefined)}
+              onSelect={handleOnSelect}
+              spellCheck="false"
             />
+
             {hasSongChanged && (
               <button
                 type="submit"
@@ -121,6 +128,6 @@ export default function Song() {
   )
 }
 
-export function ErrorBoundary({error}) {
+export function ErrorBoundary({error}: {error: Error}) {
   return <div className="lg:px- py-6 px-4 sm:px-6">{error.message}</div>
 }
