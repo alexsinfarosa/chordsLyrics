@@ -91,14 +91,14 @@ export default function Song() {
   return (
     <PanelGroup autoSaveId="song-layout" direction="horizontal">
       {isView && (
-        <Panel order={1} minSize={50}>
+        <Panel order={1} minSize={50} className="">
           {/* <textarea
             readOnly
             className="h-full w-full resize-none border-none outline-0 focus:outline-0 focus:ring-0"
             value={formattedSong}
           /> */}
           <article
-            className="prose prose-tr:border-b-0 px-4 prose-table:bg-slate-50 prose-h2:text-base prose-h2:text-gray-500 prose-h1:text-2xl prose-h2:mt-0"
+            className="prose prose-tr:border-b-0 px-4 prose-table:bg-slate-50  prose-h2:text-base prose-h2:text-gray-500 prose-h1:text-2xl prose-h2:mt-0 max-w-[478px]"
             dangerouslySetInnerHTML={{__html: formattedSong}}
           />
         </Panel>
