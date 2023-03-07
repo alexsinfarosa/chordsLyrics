@@ -52,6 +52,9 @@ export async function loader({params}: LoaderArgs) {
   return {songRaw: songRaw.data}
 }
 
+const chord = `text-sm font-semibold text-black`
+const chorus = `bg-white`
+
 export default function Song() {
   const {isEdit, isView} = useOutletContext<{
     isEdit: boolean
@@ -61,9 +64,12 @@ export default function Song() {
   const parsedSong = new ChordSheetJS.ChordProParser().parse(
     songRaw?.song || '',
   )
+  // console.log(parsedSong)
   // const formattedSong = new ChordSheetJS.TextFormatter().format(parsedSong)
-  const formattedSong = new ChordSheetJS.HtmlDivFormatter().format(parsedSong)
-  console.log(formattedSong)
+  const formattedSong = new ChordSheetJS.HtmlTableFormatter()
+    .format(parsedSong)
+    .replaceAll(/class="chord"/g, `class="${chord}"`)
+
   const [hasSongChanged, setHasSongChanged] = React.useState(false)
   const [editSong, setEditSong] = React.useState<string | undefined>()
 
@@ -85,14 +91,14 @@ export default function Song() {
   return (
     <PanelGroup autoSaveId="song-layout" direction="horizontal">
       {isView && (
-        <Panel order={1} minSize={50} className="">
+        <Panel order={1} minSize={50}>
           {/* <textarea
             readOnly
             className="h-full w-full resize-none border-none outline-0 focus:outline-0 focus:ring-0"
             value={formattedSong}
           /> */}
-          <div
-            className="h-full w-full"
+          <article
+            className="prose prose-tr:border-b-0 px-4 prose-table:bg-slate-50 prose-h2:text-base prose-h2:text-gray-500 prose-h1:text-2xl prose-h2:mt-0"
             dangerouslySetInnerHTML={{__html: formattedSong}}
           />
         </Panel>
