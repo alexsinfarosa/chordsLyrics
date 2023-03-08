@@ -53,7 +53,6 @@ export async function loader({params}: LoaderArgs) {
 }
 
 const chord = `text-sm font-semibold text-black`
-const chorus = `bg-white`
 
 export default function Song() {
   const {isEdit, isView} = useOutletContext<{
@@ -66,9 +65,13 @@ export default function Song() {
   )
   // console.log(parsedSong)
   // const formattedSong = new ChordSheetJS.TextFormatter().format(parsedSong)
-  const formattedSong = new ChordSheetJS.HtmlTableFormatter()
+  const formattedSong = new ChordSheetJS.HtmlDivFormatter()
     .format(parsedSong)
     .replaceAll(/class="chord"/g, `class="${chord}"`)
+  console.log(formattedSong)
+
+  const formatter = new ChordSheetJS.HtmlDivFormatter().cssString()
+  console.log(formatter)
 
   const [hasSongChanged, setHasSongChanged] = React.useState(false)
   const [editSong, setEditSong] = React.useState<string | undefined>()
