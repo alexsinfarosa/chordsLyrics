@@ -5,7 +5,7 @@ import {
   useNavigation,
   useOutletContext,
 } from '@remix-run/react'
-import ChordSheetJS from 'chordsheetjs'
+
 import React, {useEffect} from 'react'
 import {Panel, PanelGroup, PanelResizeHandle} from 'react-resizable-panels'
 import invariant from 'tiny-invariant'
@@ -60,19 +60,6 @@ export default function Song() {
     isView: boolean
   }>()
   const {songRaw} = useLoaderData<typeof loader>()
-  const parsedSong = new ChordSheetJS.ChordProParser().parse(
-    songRaw?.song || '',
-  )
-  // console.log(parsedSong)
-  // const formattedSong = new ChordSheetJS.TextFormatter().format(parsedSong)
-  const formattedSong = new ChordSheetJS.HtmlDivFormatter()
-    .format(parsedSong)
-    .replaceAll(/class="chord"/g, `class="${chord}"`)
-  console.log(formattedSong)
-
-  const formatter = new ChordSheetJS.HtmlDivFormatter().cssString()
-  console.log(formatter)
-
   const [hasSongChanged, setHasSongChanged] = React.useState(false)
   const [editSong, setEditSong] = React.useState<string | undefined>()
 
@@ -102,7 +89,7 @@ export default function Song() {
           /> */}
           <article
             className="prose prose-tr:border-b-0 px-4 prose-table:bg-slate-50  prose-h2:text-base prose-h2:text-gray-500 prose-h1:text-2xl prose-h2:mt-0 max-w-[478px]"
-            dangerouslySetInnerHTML={{__html: formattedSong}}
+            // dangerouslySetInnerHTML={{__html: formattedSong}}
           />
         </Panel>
       )}
@@ -121,7 +108,7 @@ export default function Song() {
             <textarea
               className="h-[calc(100vh-74px)] w-full resize-none overflow-auto border-none outline-0 focus:outline-0 focus:ring-0"
               name="song"
-              value={editSong}
+              value={''}
               onChange={e => setEditSong(e.target.value)}
               onSelect={handleOnSelect}
               spellCheck="false"
