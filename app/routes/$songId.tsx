@@ -11,6 +11,8 @@ import {Panel, PanelGroup, PanelResizeHandle} from 'react-resizable-panels'
 import invariant from 'tiny-invariant'
 import {supabase} from '~/utils/supabase'
 
+// import {parseSong, renderSong} from 'chord-mark/lib/chord-mark'
+
 export async function action({params, request}: ActionArgs) {
   invariant(params.songId, 'songId not found')
 
@@ -77,6 +79,10 @@ export default function Song() {
   useEffect(() => {
     setEditSong(songRaw?.song)
   }, [songRaw])
+
+  // const parsed = parseSong('A\n_mySong')
+  // const rendered = renderSong(parsed)
+  // console.log(rendered)
 
   return (
     <PanelGroup autoSaveId="song-layout" direction="horizontal">
